@@ -1,25 +1,18 @@
-import unittest
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
-import time
+import PyPDF2
+from gtts import gTTS
 
+pdf_file = open("<PDF_FILE_PATH>.pdf", 'rb')
 
-class PythonOrgSearch(unittest.TestCase):
+pdf_reader = PyPDF2.PdfReader(pdf_file)
+page = pdf_reader.pages
 
-    def setUp(self):
-        self.driver = webdriver.Chrome()
-
-    def test_search_in_python_org(self):
-        driver = self.driver
-        driver.get("https://www.python.org/")
-        self.assertIn("Python", driver.title)
-        input = driver.find_element(By.XPATH, '/html/body/div[1]/header/div/div[1]/div/form/fieldset/input')
-        input.send_keys('wpisz tu coś')
-
-    def tearDown(self):
-        self.driver.close()
-
-
-if __name__ == '__main__':
-    unittest.main()
+text = None
+if len(page) == 1:
+    text = page[0].extract_text()
+else:
+    text = []
+    for num in range(0, len(page)):
+        text.append(page[num].extract_text())
+    text = ''.join(text)
+tts = gTTS(text, lang="en")
+tts.save('audio.mp3')
